@@ -275,8 +275,63 @@
   - VO list를 만드는 과정에서 원하지 않는 정보까지 VO list에 들어가는 현상 발생
   - hp_name 속성을 기준으로 null 일 시 list에 add하지 않는 로직으로 대체
   - 기존에 받았던 두 종류의 시간을 한 가지로 단일화 시키고 조금 더 간결한 코드 작업(경우의 수가 줄어듦)
+  
+- VO 객체를 만들어서 data를 받아오는 것까지는 성공했는데 data가 스트링의 형태로 원하는 정보를 얻기 위한 parsing작업이 필요함
 
+  - Controller
 
+  ```java
+  // list를 JSON 형태로 변환
+  String hospital = new Gson().toJson(list);
+  		System.out.println(hospital);
+  ```
+
+  - Js
+
+  ```js
+   $.ajax({
+  					         type:"post",
+  					         url:"/ais/hospital",
+  					         data :{"lang":lang,"lat":lat,"hp_subject":hp_subject,"time":time},
+  					         async: false,
+  						     success:function (data,textStatus){
+  						    	 alert(data);
+  						    	 resultText = JSON.parse(data);
+  						    	 //alert(resultText[0].hp_name);
+  						    	 for(var i=0; i<resultText.length; i++){
+  						    	  	$('#name'+i).text("이름 : "+resultText[i].hp_name);
+  						    	  	$('#addr'+i).text("주소 : "+resultText[i].hp_addr);
+  						    	  	$('#subj'+i).text("진료과 : "+resultText[i].hp_subject);
+  						    	  	$('#dutyTime'+i).text("진료시간 : "+resultText[i].hp_dutyTime1+ "~"+ resultText[i].hp_dutyTime2);
+  						    	  	$('#message'+i).text(resultText[i].message);
+  						    	  	$('#link'+i).append("<a href='http://localhost:9090/ais/hospital_detail?hp_name="+resultText[i].hp_name+"'>더보기</a>");		
+  						    	  }
+  						     },
+  ```
+
+  - JSP
+
+  ```jsp
+  <div class="list">
+                  병원리스트
+                  <%int cnt = 0;
+                  for(int i =0; i<10; i++) {%>
+                  <div id="hospitalList<%=cnt%>">
+                  	<div id="name<%=cnt%>"></div>
+                  	<div id="addr<%=cnt%>"></div>
+                  	<div id="subj<%=cnt%>"></div>
+                  	<div id="dutyTime<%=cnt%>"></div>
+                  	<div id="message<%=cnt%>"></div>
+                  	<div id ="link<%=cnt%>"></div><br>
+                 	</div>             	
+                	<%cnt += 1;
+                	} %>
+              </div>
+  ```
+
+- 정보를 호출하기 쉬운 형태로 변환 후에 반복문을 이용해서 원하는 정보들을 나열할 수 있었음
+
+- ``append`` 메소드를 이용하면 추가적인 태그 정보를 입력할 수 있음
 
 ## 데이터 참조
 
