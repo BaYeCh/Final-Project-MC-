@@ -304,7 +304,9 @@
   						    	  	$('#subj'+i).text("진료과 : "+resultText[i].hp_subject);
   						    	  	$('#dutyTime'+i).text("진료시간 : "+resultText[i].hp_dutyTime1+ "~"+ resultText[i].hp_dutyTime2);
   						    	  	$('#message'+i).text(resultText[i].message);
-  						    	  	$('#link'+i).append("<a href='http://localhost:9090/ais/hospital_detail?hp_name="+resultText[i].hp_name+"'>더보기</a>");		
+  						    	  	//$('#link'+i).append("<a href='http://localhost:9090/ais/hospital_detail?hp_name="+resultText[i].hp_name+"'>더보기</a>");		
+                                       $('#link'+i).attr("href","http://localhost:9090/ais/hospital_detail?hpid="+resultText[i].hpid);
+  						    	  	$('#link'+i).text("상세정보");
   						    	  }
   						     },
   ```
@@ -331,7 +333,87 @@
 
 - 정보를 호출하기 쉬운 형태로 변환 후에 반복문을 이용해서 원하는 정보들을 나열할 수 있었음
 
-- ``append`` 메소드를 이용하면 추가적인 태그 정보를 입력할 수 있음
+- ``append`` 메소드를 이용하면 추가적인 태그 정보를 입력할 수 있음 
+
+  - append를 사용하고 이후에 또 정보를 찾는 과정을 거치면 그 전에 있던 정보는 사라지지 않고 덧 붙여짐
+  - 따라서 append가 아닌 attr(속성)을 이용해서 할 것!
+
+- 약국 리스트 추가 (병원리스트에 마다 근처 약국 표시 버튼 추가)
+
+- 마커 표시
+
+  ```js
+  //초기 화면에서 띄울 맵 정보 (멀티캠퍼스 선릉점)
+  var cityhall = new naver.maps.LatLng(37.5033046,127.050273),
+      map = new naver.maps.Map('map', {
+          center: cityhall.destinationPoint(0, 500),
+          zoom: 15
+      }),
+      marker = new naver.maps.Marker({
+          map: map,
+          position: cityhall
+      });
+  var contentString = [
+          '<div class="iw_inner">',
+          '   <h3>멀티캠퍼스 선릉</h3>',
+          '   <p>서울특별시 강남구 선릉로 428 | 서울특별시 강남구 대치동 889-41<br />',
+          '       <a href="www.multicampus.com" target="_blank">www.multicampus.com/</a>',
+          '   </p>',
+          '</div>'
+      ].join('');
+  
+  var infoWindow = new naver.maps.InfoWindow({
+      content: contentString
+  });
+  //클릭하면 닫히게 만드는 로직
+  naver.maps.Event.addListener(marker, "click", function(e) {
+      if (infoWindow.getMap()) {
+          infoWindow.close();
+      } else {
+          infoWindow.open(map, marker);
+      }
+  });
+  infoWindow.open(map, marker);
+  ```
+
+  - 동시에 여러 개의 마커를 띄우는 경우
+
+    ```js
+    //마커와 클릭들을 저장하는 배열	
+    	let markers = new Array();
+    	let infoWindows = new Array();
+    for(var i=0; i<resultText.length; i++){
+    	var marker = new naver.maps.Marker({
+    	position: new naver.maps.LatLng(resultText[i].lat, resultText[i].lang),
+    	map: map	 	
+    	});
+    								
+    	var infoWindow = new naver.maps.InfoWindow({
+        								
+    	content : '<div style="width:150px;text-align:center;padding:10px;"><b>'+ resultText[i].hp_name +'</b></div>'
+    	});
+    	markers.push(marker);
+    	infoWindows.push(infoWindow);
+    	}
+    	function getClickHandler(seq) {
+    	return function(e) {  // 마커를 클릭하는 부분
+         var marker = markers[seq], // 클릭한 마커의 시퀀스로 찾는다.
+    	infoWindow = infoWindows[seq]; // 클릭한 마커의 시퀀스로 찾는다
+            if (infoWindow.getMap()) {
+                infoWindow.close();
+            } else {
+                infoWindow.open(map, marker); // 표출 
+            }
+        }
+        }
+    for (var i=0; i<markers.length; i++) {
+        //console.log(markers[i] , getClickHandler(i));
+        naver.maps.Event.addListener(markers[i], 'click', getClickHandler(i)); // 클릭한 마커 핸들러
+    }
+    ```
+
+    
+
 
 ## 데이터 참조
 
