@@ -412,7 +412,19 @@
     }
     ```
 
-    
+  - [마커 참고](https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=lsw3210&logNo=221993983515)
+  
+  - 마커 아이콘을 설정할 때 크기를 결정해주어야 함
+  
+  - 우리가 원하는 수의 리스트를 뽑지 못하는 경우 div 의 내용을 온전히 대체하지 못해서 이전의 결과가 같이 나오는 문제 발생
+  
+    - ```js
+      //부모 선택자를 이용해서 초기화 시켜주는 로직을 만듦
+      $('.hospitalList div').html('');
+      $('.pharmacyList div').html('');
+      ```
+  
+    - 매번 새로운 정보를 불러올 때마다 새 바탕에 쓰여질 수 있도록 함
 
 
 ## 데이터 참조
