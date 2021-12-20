@@ -302,7 +302,7 @@
   - VO list를 만드는 과정에서 원하지 않는 정보까지 VO list에 들어가는 현상 발생
   - hp_name 속성을 기준으로 null 일 시 list에 add하지 않는 로직으로 대체
   - 기존에 받았던 두 종류의 시간을 한 가지로 단일화 시키고 조금 더 간결한 코드 작업(경우의 수가 줄어듦)
-  
+
 - VO 객체를 만들어서 data를 받아오는 것까지는 성공했는데 data가 스트링의 형태로 원하는 정보를 얻기 위한 parsing작업이 필요함
 
   - Controller
@@ -440,18 +440,48 @@
     ```
 
   - [마커 참고](https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=lsw3210&logNo=221993983515)
-  
+
   - 마커 아이콘을 설정할 때 크기를 결정해주어야 함
-  
+
   - 우리가 원하는 수의 리스트를 뽑지 못하는 경우 div 의 내용을 온전히 대체하지 못해서 이전의 결과가 같이 나오는 문제 발생
-  
+
     - ```js
       //부모 선택자를 이용해서 초기화 시켜주는 로직을 만듦
       $('.hospitalList div').html('');
       $('.pharmacyList div').html('');
       ```
-  
+
     - 매번 새로운 정보를 불러올 때마다 새 바탕에 쓰여질 수 있도록 함
+
+- 원하는 정보를 불러오지 못했을 경우(resultText.length==0)에 필요한 alert 문을 추가(조건문 if)
+
+- 기입해야 하는 정보를 기입하지 않았을 때 alert문 추가(locale=="", time=="")
+
+- 진료 과에 경우 특정하지 않았을 때와 선택란에 있는 것 말고도의 과 진료에 대해서 알아보고자 할 때 로직 추가
+
+  ```java
+  // 진료 과를 선택하지 않았을 때 나오는 출력 2021.12.20 추가 (참고)위 변수도 추가되어있음
+  				if( hosp.getHp_subject().equals("상관없음") ) {
+  					subject = "과";
+  					case_name_etc = getTagValue("dgidIdName", eElement).contains(subject);
+  				}
+  				else if ( hosp.getHp_subject().equals("기타") ){
+  					case_name_etc = ( !getTagValue("dgidIdName", eElement).contains("소아청소년과")
+  									&& !getTagValue("dgidIdName", eElement).contains("이비인후과")
+  									&& !getTagValue("dgidIdName", eElement).contains("치과")
+  									&& !getTagValue("dgidIdName", eElement).contains("안과")
+  									&& !getTagValue("dgidIdName", eElement).contains("피부과")
+  									&& !getTagValue("dgidIdName", eElement).contains("내과")
+  									);
+  				}
+  				else {
+  					subject = hosp.getHp_subject();
+  					case_name_etc = getTagValue("dgidIdName", eElement).contains(subject);
+  				}
+  ```
+
+  - 어떤 조건문이건 간에 사용하는 모든 변수를 선언하고 그 선언한 변수에 값을 할당하고 변수를 사용하는 것이 코드 중에 가장 간단하고 보기 쉬운 코드임을 알 수 있었기에 이 코딩 아이디어에 추가함
+
 
 
 ## 데이터 참조
